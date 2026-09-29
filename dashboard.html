@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard — SahodPH</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar">
+    <span class="brand">SahodPH</span>
+    <span id="user-info">Loading...</span>
+</header>
+<main class="container">
+    <h1>Dashboard</h1>
+    <p>Auth is working. Employee, attendance, and payroll modules land in the next stages.</p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/auth.js"></script>
+<script>
+(async () => {
+    const session = await requireAuth();
+    if (!session) return;
+
+    const profile = await getProfile(session.user.id);
+    const userInfo = document.getElementById('user-info');
+
+    const displayName = profile?.username || session.user.email;
+    const role = profile?.role || 'unknown';
+
+    userInfo.innerHTML =
+        'Signed in as <strong>' + escapeHtml(displayName) + '</strong> (' +
+        escapeHtml(role) + ') &middot; <a href="#" id="logout-link">Log out</a>';
+
+    document.getElementById('logout-link').addEventListener('click', async (e) => {
+        e.preventDefault();
+        await logout();
+    });
+})();
+</script>
+</body>
+</html>

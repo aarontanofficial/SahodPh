@@ -70,6 +70,7 @@ async function loadPeriods() {
                 <td>${p.period_end}</td>
                 <td>${p.release_date}</td>
                 <td>${escapeHtml(p.status)}</td>
+                <td><a href="payroll-run.html?period_id=${p.id}" class="btn btn-secondary" style="padding:4px 10px; font-size:0.8rem;">Run Payroll</a></td>
             </tr>
         `;
     }).join('');

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payroll Run — SahodPH</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar">
+    <span class="brand">SahodPH</span>
+    <span id="user-info">Loading...</span>
+</header>
+<main class="container">
+    <div class="page-header">
+        <h1 id="page-title">Payroll Run</h1>
+        <div style="display:flex; gap:8px;">
+            <button id="calculate-btn" class="btn btn-primary" style="display:none;">Calculate / Recalculate All</button>
+            <a href="payroll-periods.html" class="btn btn-secondary">&larr; Periods</a>
+        </div>
+    </div>
+
+    <div id="error-box" class="alert alert-error" style="display:none;"></div>
+    <div id="success-box" class="alert alert-success" style="display:none;"></div>
+    <div id="loading" class="muted">Loading...</div>
+
+    <div class="table-wrap">
+        <table id="run-table" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Basic Pay</th>
+                    <th>Gross Pay</th>
+                    <th>Deductions</th>
+                    <th>Net Pay</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="run-tbody"></tbody>
+        </table>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/payroll.js"></script>
+<script>
+(async () => {
+    const profile = await requireRole(['admin', 'hr', 'payroll']);
+    if (!profile) return;
+
+    document.getElementById('user-info').innerHTML =
+        'Signed in as <strong>' + escapeHtml(profile.username) + '</strong> (' +
+        escapeHtml(profile.role) + ') &middot; <a href="dashboard.html">Dashboard</a> &middot; <a href="#" id="logout-link">Log out</a>';
+    document.getElementById('logout-link').addEventListener('click', async (e) => {
+        e.preventDefault();
+        await logout();
+    });
+
+    if (profile.role === 'admin' || profile.role === 'payroll') {
+        document.getElementById('calculate-btn').style.display = 'inline-block';
+    }
+
+    await initPayrollRun();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Salary History — SahodPH</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar">
+    <span class="brand">SahodPH</span>
+    <span id="user-info">Loading...</span>
+</header>
+<main class="container">
+    <div class="page-header">
+        <h1 id="page-title">Salary History</h1>
+        <a href="employees.html" class="btn btn-secondary">&larr; Back to list</a>
+    </div>
+
+    <div id="error-box" class="alert alert-error" style="display:none;"></div>
+    <div id="success-box" class="alert alert-success" style="display:none;"></div>
+
+    <div class="card-form" style="max-width:100%; margin-bottom:20px;">
+        <p class="muted" style="margin:0;">Current daily rate</p>
+        <p id="current-rate" style="font-size:1.6rem; font-weight:700; margin:4px 0 0;">Loading...</p>
+    </div>
+
+    <div id="add-rate-section" style="display:none;">
+        <h2 style="font-size:1.1rem;">Add Rate Change</h2>
+        <form id="rate-form" class="card-form">
+            <input type="hidden" id="employee-id">
+
+            <label for="new_rate">New Daily Rate (₱) *</label>
+            <input type="number" id="new_rate" step="0.01" min="0" required>
+
+            <label for="rate_type">Rate Type</label>
+            <select id="rate_type">
+                <option value="daily">Daily</option>
+                <option value="monthly">Monthly</option>
+                <option value="hourly">Hourly</option>
+            </select>
+
+            <label for="effective_date">Effective Date *</label>
+            <input type="date" id="effective_date" required>
+
+            <label for="reason">Reason</label>
+            <textarea id="reason" rows="2" placeholder="e.g. Annual increase, promotion, adjustment"></textarea>
+
+            <button type="submit" id="submit-btn">Save Rate Change</button>
+        </form>
+    </div>
+
+    <h2 style="font-size:1.1rem;">History</h2>
+    <div id="loading" class="muted">Loading history...</div>
+    <div id="empty-state" class="muted" style="display:none;"></div>
+
+    <div class="table-wrap">
+        <table id="history-table" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Effective Date</th>
+                    <th>Previous Rate</th>
+                    <th>New Rate</th>
+                    <th>Type</th>
+                    <th>Reason</th>
+                    <th>Recorded</th>
+                </tr>
+            </thead>
+            <tbody id="history-tbody"></tbody>
+        </table>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/salary.js"></script>
+<script>
+(async () => {
+    const profile = await requireRole(['admin', 'hr', 'payroll']);
+    if (!profile) return;
+
+    document.getElementById('user-info').innerHTML =
+        'Signed in as <strong>' + escapeHtml(profile.username) + '</strong> (' +
+        escapeHtml(profile.role) + ') &middot; <a href="dashboard.html">Dashboard</a> &middot; <a href="#" id="logout-link">Log out</a>';
+    document.getElementById('logout-link').addEventListener('click', async (e) => {
+        e.preventDefault();
+        await logout();
+    });
+
+    if (profile.role === 'admin' || profile.role === 'hr') {
+        document.getElementById('add-rate-section').style.display = 'block';
+    }
+
+    await initSalaryHistory();
+})();
+</script>
+</body>
+</html>

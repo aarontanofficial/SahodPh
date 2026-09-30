@@ -162,3 +162,42 @@ tbody tr:hover { background: #f8f9fa; }
 }
 
 .checkbox-label input { width: auto; }
+/* Payslip */
+.payslip-sheet {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.payslip-header { text-align: center; margin-bottom: 20px; }
+.payslip-header h2 { margin: 0; }
+
+.payslip-info { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.9rem; }
+.payslip-info td { padding: 4px 0; }
+.payslip-info td:first-child { width: 40%; color: #5f6368; }
+
+.payslip-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 16px; }
+.payslip-table th, .payslip-table td { padding: 6px 4px; border-bottom: 1px solid var(--border); text-align: left; }
+.payslip-table tfoot td { border-top: 2px solid var(--border); border-bottom: none; padding-top: 8px; }
+
+.payslip-net {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #e8f0fe;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-top: 10px;
+}
+
+@media print {
+    .no-print { display: none !important; }
+    body { background: #fff; }
+    .payslip-sheet { border: none; padding: 0; max-width: 100%; }
+    .container { padding: 0; max-width: 100%; }
+}

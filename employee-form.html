@@ -110,9 +110,16 @@
         e.preventDefault();
         await logout();
     });
-
+    const params = new URLSearchParams(window.location.search);
+    const employeeId = params.get('id');
+    if (employeeId) {
+        const link = document.getElementById('salary-history-link');
+        link.href = 'salary-history.html?id=' + employeeId;
+        link.style.display = 'inline-block';
+    }
     await initEmployeeForm();
 })();
+    
 </script>
 </body>
 </html>

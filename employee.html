@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Employees — SahodPH</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar">
+    <span class="brand">SahodPH</span>
+    <span id="user-info">Loading...</span>
+</header>
+<main class="container">
+    <div class="page-header">
+        <h1>Employees</h1>
+        <a href="employee-form.html" id="add-btn" class="btn btn-primary" style="display:none;">+ Add Employee</a>
+    </div>
+
+    <input type="text" id="search-box" placeholder="Search by name, code, department, position..." class="search-input">
+
+    <div id="loading" class="muted">Loading employees...</div>
+    <div id="empty-state" class="muted" style="display:none;"></div>
+
+    <div class="table-wrap">
+        <table id="employees-table" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Department</th>
+                    <th>Status</th>
+                    <th>Date Hired</th>
+                    <th>Active</th>
+                </tr>
+            </thead>
+            <tbody id="employees-tbody"></tbody>
+        </table>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/employees.js"></script>
+<script>
+(async () => {
+    const profile = await requireRole(['admin', 'hr', 'payroll']);
+    if (!profile) return;
+
+    document.getElementById('user-info').innerHTML =
+        'Signed in as <strong>' + escapeHtml(profile.username) + '</strong> (' +
+        escapeHtml(profile.role) + ') &middot; <a href="dashboard.html">Dashboard</a> &middot; <a href="#" id="logout-link">Log out</a>';
+    document.getElementById('logout-link').addEventListener('click', async (e) => {
+        e.preventDefault();
+        await logout();
+    });
+
+    if (profile.role === 'admin' || profile.role === 'hr') {
+        document.getElementById('add-btn').style.display = 'inline-block';
+    }
+
+    await loadEmployees();
+
+    let searchTimer;
+    document.getElementById('search-box').addEventListener('input', (e) => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => loadEmployees(e.target.value.trim()), 300);
+    });
+})();
+</script>
+</body>
+</html>

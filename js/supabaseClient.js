@@ -6,6 +6,6 @@
 // NEVER put your "service_role" key here - that one is secret.
 
 const SUPABASE_URL = 'https://cjpxzocqxnhkxcsjhwgb.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqcHh6b2NxeG5oa3hjc2pod2diIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxNTYwMTAsImV4cCI6MjEwNTczMjAxMH0.AgDHtG8Vh92AL5h6e5NbvV_4d8TiQyN0m2h46Bm8-dU';
+const SUPABASE_ANON_KEY = 'sb_publishable_bt7p6ECRh_ULtOmTmHIS-A_WbDVkrMG';
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

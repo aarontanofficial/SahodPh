@@ -1,5 +1,5 @@
 // js/auth.js
-// Shared auth helpers used by index.html and dashboard.html.
+// Shared auth helpers used by every page.
 // Requires supabaseClient.js to be loaded first.
 
 async function getSession() {
@@ -25,6 +25,23 @@ async function requireGuest() {
     }
 }
 
+// Call at the top of a page restricted to certain roles.
+// Returns the profile object if allowed, otherwise redirects and returns null.
+async function requireRole(allowedRoles) {
+    const session = await requireAuth();
+    if (!session) return null;
+
+    const profile = await getProfile(session.user.id);
+
+    if (!profile || !allowedRoles.includes(profile.role)) {
+        alert("You don't have permission to view this page.");
+        window.location.href = 'dashboard.html';
+        return null;
+    }
+
+    return profile;
+}
+
 async function login(email, password) {
     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
@@ -48,12 +65,13 @@ async function logout() {
 // Writes to audit_logs. Only logs actions for the currently authenticated
 // user - RLS only allows a user to insert a row where user_id = their own
 // auth.uid(), so this cannot be used to forge logs for other users.
-async function logAudit(userId, action, details) {
+async function logAudit(userId, action, details, targetId) {
     try {
         await supabaseClient.from('audit_logs').insert({
             user_id: userId,
             action: action,
             details: details,
+            target_id: targetId || null,
         });
     } catch (e) {
         console.error('Audit log failed', e);

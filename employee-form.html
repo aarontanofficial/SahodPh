@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Employee — SahodPH</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar">
+    <span class="brand">SahodPH</span>
+    <span id="user-info">Loading...</span>
+</header>
+<main class="container">
+    <div class="page-header">
+        <h1 id="form-title">Add Employee</h1>
+        <a href="employees.html" class="btn btn-secondary">&larr; Back to list</a>
+    </div>
+
+    <div id="error-box" class="alert alert-error" style="display:none;"></div>
+    <div id="success-box" class="alert alert-success" style="display:none;"></div>
+
+    <form id="employee-form" class="card-form" novalidate>
+        <input type="hidden" id="employee-id">
+
+        <label for="employee_code">Employee Code</label>
+        <input type="text" id="employee_code" placeholder="Leave blank to auto-generate">
+
+        <div class="form-row">
+            <div>
+                <label for="first_name">First Name *</label>
+                <input type="text" id="first_name" required>
+            </div>
+            <div>
+                <label for="middle_name">Middle Name</label>
+                <input type="text" id="middle_name">
+            </div>
+            <div>
+                <label for="last_name">Last Name *</label>
+                <input type="text" id="last_name" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div>
+                <label for="contact_number">Contact Number</label>
+                <input type="text" id="contact_number">
+            </div>
+            <div>
+                <label for="email">Email</label>
+                <input type="email" id="email">
+            </div>
+        </div>
+
+        <label for="address">Address</label>
+        <textarea id="address" rows="2"></textarea>
+
+        <div class="form-row">
+            <div>
+                <label for="position">Position</label>
+                <input type="text" id="position">
+            </div>
+            <div>
+                <label for="department">Department</label>
+                <input type="text" id="department">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div>
+                <label for="employment_status">Employment Status</label>
+                <select id="employment_status">
+                    <option value="Regular">Regular</option>
+                    <option value="Probationary">Probationary</option>
+                    <option value="Contractual">Contractual</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Project-based">Project-based</option>
+                </select>
+            </div>
+            <div>
+                <label for="date_hired">Date Hired *</label>
+                <input type="date" id="date_hired" required>
+            </div>
+        </div>
+
+        <label class="checkbox-label">
+            <input type="checkbox" id="is_active" checked>
+            Active
+        </label>
+
+        <button type="submit" id="submit-btn">Save Employee</button>
+    </form>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/employees.js"></script>
+<script>
+(async () => {
+    const profile = await requireRole(['admin', 'hr']);
+    if (!profile) return;
+
+    document.getElementById('user-info').innerHTML =
+        'Signed in as <strong>' + escapeHtml(profile.username) + '</strong> (' +
+        escapeHtml(profile.role) + ') &middot; <a href="dashboard.html">Dashboard</a> &middot; <a href="#" id="logout-link">Log out</a>';
+    document.getElementById('logout-link').addEventListener('click', async (e) => {
+        e.preventDefault();
+        await logout();
+    });
+
+    await initEmployeeForm();
+})();
+</script>
+</body>
+</html>

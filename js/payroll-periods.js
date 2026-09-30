@@ -2,25 +2,33 @@
 // Dynamic weekly payroll period generation: Friday-Thursday cycle,
 // cutoff = Thursday (inclusive), release = the following Saturday.
 // Requires supabaseClient.js and auth.js.
+//
+// All date math below works on YYYY-MM-DD strings via UTC midnight,
+// so it's never affected by the browser's local timezone offset
+// (important since PH is UTC+8 - using local Date/toISOString()
+// directly was silently shifting dates back by a day).
 
-// Given any date, returns the Thursday (as YYYY-MM-DD) that ends the
-// Friday-Thursday cycle containing that date.
-function thursdayEndingCycleFor(date) {
-    const dow = date.getDay(); // Sun=0 ... Sat=6
-    const daysUntilThursday = (4 - dow + 7) % 7; // Thu=4
-    const result = new Date(date);
-    result.setDate(result.getDate() + daysUntilThursday);
-    return result;
-}
-
-function toDateStr(d) {
-    return d.toISOString().slice(0, 10);
+function todayDateStr() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 function addDays(dateStr, days) {
-    const d = new Date(dateStr + 'T00:00:00');
-    d.setDate(d.getDate() + days);
-    return toDateStr(d);
+    const d = new Date(dateStr + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + days);
+    return d.toISOString().slice(0, 10);
+}
+
+// Given a YYYY-MM-DD string, returns the Thursday (as YYYY-MM-DD) that
+// ends the Friday-Thursday cycle containing that date.
+function thursdayEndingCycleFor(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00Z');
+    const dow = d.getUTCDay(); // Sun=0 ... Sat=6
+    const daysUntilThursday = (4 - dow + 7) % 7; // Thu=4
+    return addDays(dateStr, daysUntilThursday);
 }
 
 async function initPayrollPeriods() {
@@ -60,7 +68,7 @@ async function loadPeriods() {
         return;
     }
 
-    const today = toDateStr(new Date());
+    const today = todayDateStr();
 
     tbody.innerHTML = data.map(p => {
         const isCurrent = p.period_start <= today && today <= p.period_end;
@@ -107,7 +115,7 @@ async function generateNextPeriod() {
         periodEnd = addDays(latest[0].period_end, 7);
     } else {
         // First period ever: the cycle containing today
-        periodEnd = toDateStr(thursdayEndingCycleFor(new Date()));
+        periodEnd = thursdayEndingCycleFor(todayDateStr());
     }
 
     const periodStart = addDays(periodEnd, -6);

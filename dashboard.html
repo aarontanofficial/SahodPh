@@ -13,31 +13,108 @@
 </header>
 <main class="container">
     <h1>Dashboard</h1>
-    <p>Auth is working. Employee, attendance, and payroll modules land in the next stages.</p>
+
+    <nav class="dash-nav">
+        <a href="employees.html">Employees</a>
+        <a href="attendance.html">Attendance</a>
+        <a href="payroll-periods.html">Payroll Periods</a>
+        <a href="budget.html">Budget</a>
+        <a href="government-rules.html" id="nav-gov-rules" style="display:none;">Government Rules</a>
+    </nav>
+
+    <h2 class="section-title">Payroll Period</h2>
+    <div class="summary-grid">
+        <div class="summary-card">
+            <p class="muted" style="margin:0;">Current Period</p>
+            <p class="summary-amount" id="d-period" style="font-size:1.1rem;">—</p>
+        </div>
+        <div class="summary-card">
+            <p class="muted" style="margin:0;">Next Cutoff</p>
+            <p class="summary-amount" id="d-cutoff" style="font-size:1.1rem;">—</p>
+        </div>
+        <div class="summary-card">
+            <p class="muted" style="margin:0;">Next Release</p>
+            <p class="summary-amount" id="d-release" style="font-size:1.1rem;">—</p>
+        </div>
+    </div>
+
+    <div id="no-employee-note" class="alert alert-error" style="display:none; margin-top:20px;"></div>
+
+    <div id="employee-section" style="display:none;">
+        <h2 class="section-title">My Salary</h2>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <p class="muted" style="margin:0;">Current Daily Rate</p>
+                <p class="summary-amount" id="d-rate">—</p>
+            </div>
+            <div class="summary-card">
+                <p class="muted" style="margin:0;">Estimated Current Salary</p>
+                <p class="summary-amount" id="d-estimated">—</p>
+            </div>
+            <div class="summary-card">
+                <p class="muted" style="margin:0;">Latest Released Salary</p>
+                <p class="summary-amount" id="d-latest-released">—</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">Attendance This Period</h2>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <p class="muted" style="margin:0;">Days Present</p>
+                <p class="summary-amount" id="d-present">—</p>
+            </div>
+            <div class="summary-card">
+                <p class="muted" style="margin:0;">Days Absent</p>
+                <p class="summary-amount" id="d-absent">—</p>
+            </div>
+            <div class="summary-card">
+                <p class="muted" style="margin:0;">Overtime Hours</p>
+                <p class="summary-amount" id="d-overtime">—</p>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="section-title">Budget</h2>
+    <div class="summary-grid">
+        <div class="summary-card">
+            <p class="muted" style="margin:0;">Total Income</p>
+            <p class="summary-amount" id="d-income">—</p>
+        </div>
+        <div class="summary-card">
+            <p class="muted" style="margin:0;">Total Expenses</p>
+            <p class="summary-amount" id="d-expenses">—</p>
+        </div>
+        <div class="summary-card">
+            <p class="muted" style="margin:0;">Remaining</p>
+            <p class="summary-amount" id="d-remaining">—</p>
+        </div>
+    </div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabaseClient.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/dashboard.js"></script>
 <script>
 (async () => {
     const session = await requireAuth();
     if (!session) return;
 
     const profile = await getProfile(session.user.id);
-    const userInfo = document.getElementById('user-info');
 
-    const displayName = profile?.username || session.user.email;
-    const role = profile?.role || 'unknown';
-
-    userInfo.innerHTML =
-        'Signed in as <strong>' + escapeHtml(displayName) + '</strong> (' +
-        escapeHtml(role) + ') &middot; <a href="#" id="logout-link">Log out</a>';
-
+    document.getElementById('user-info').innerHTML =
+        'Signed in as <strong>' + escapeHtml(profile.username) + '</strong> (' +
+        escapeHtml(profile.role) + ') &middot; <a href="#" id="logout-link">Log out</a>';
     document.getElementById('logout-link').addEventListener('click', async (e) => {
         e.preventDefault();
         await logout();
     });
+
+    if (profile.role === 'admin') {
+        document.getElementById('nav-gov-rules').style.display = 'inline';
+    }
+
+    await initDashboard(session.user.id, profile);
 })();
 </script>
 </body>

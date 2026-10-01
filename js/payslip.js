@@ -137,3 +137,34 @@ async function markReceived() {
     await logAudit(session.user.id, 'salary_received', '', payslipRecordId);
     await loadPayslip();
 }
+async function addSalaryToBudget() {
+    const { data: record } = await supabaseClient
+        .from('payroll_records')
+        .select('net_pay, payroll_periods(release_date)')
+        .eq('id', payslipRecordId)
+        .single();
+
+    const session = await getSession();
+
+    const { error } = await supabaseClient.from('income').insert({
+        source_type: 'salary',
+        amount: record.net_pay,
+        date: record.payroll_periods.release_date,
+        description: 'Salary from payroll',
+        payroll_record_id: payslipRecordId,
+        created_by: session.user.id,
+    });
+
+    if (error) {
+        if (error.code === '23505') {
+            alert('This salary has already been added to the budget.');
+        } else {
+            alert('Failed: ' + error.message);
+        }
+        return;
+    }
+
+    await logAudit(session.user.id, 'salary_added_to_budget', '', payslipRecordId);
+    document.getElementById('add-to-budget-btn').style.display = 'none';
+    document.getElementById('release-info').textContent += ' · Added to budget';
+}

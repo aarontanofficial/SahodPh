@@ -201,3 +201,29 @@ tbody tr:hover { background: #f8f9fa; }
     .payslip-sheet { border: none; padding: 0; max-width: 100%; }
     .container { padding: 0; max-width: 100%; }
 }
+.dash-nav {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin: 12px 0 24px;
+    font-size: 0.9rem;
+}
+.dash-nav a { color: var(--primary); text-decoration: none; font-weight: 600; }
+.dash-nav a:hover { text-decoration: underline; }
+
+.section-title { font-size: 1.1rem; margin: 24px 0 10px; }
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.summary-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+}
+
+.summary-amount { font-size: 1.3rem; font-weight: 700; margin: 4px 0 0; }

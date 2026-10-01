@@ -81,7 +81,7 @@ async function logAudit(userId, action, details, targetId) {
 async function getProfile(userId) {
     const { data, error } = await supabaseClient
         .from('profiles')
-        .select('username, role, is_active')
+        .select('username, role, is_active, employee_id')
         .eq('id', userId)
         .single();
 

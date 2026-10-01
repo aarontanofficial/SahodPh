@@ -67,16 +67,28 @@ async function loadPayslip() {
         releaseBtn.style.display = 'inline-block';
     }
 
-    if (record.status === 'RELEASED') {
+        if (record.status === 'RELEASED') {
         infoLine.textContent = `Released ${new Date(record.released_at).toLocaleString()}`;
         if (!record.received_at && window.canReleasePayroll) {
             receivedBtn.style.display = 'inline-block';
         } else if (record.received_at) {
             infoLine.textContent += ` · Received ${new Date(record.received_at).toLocaleString()}`;
         }
-    }
-}
 
+        if (record.received_at) {
+            const { data: existingIncome } = await supabaseClient
+                .from('income')
+                .select('id')
+                .eq('payroll_record_id', payslipRecordId)
+                .maybeSingle();
+
+            if (!existingIncome) {
+                document.getElementById('add-to-budget-btn').style.display = 'inline-block';
+            } else {
+                document.getElementById('release-info').textContent += ' · Already added to budget';
+            }
+        }
+    }
 function showPayslipError(msg) {
     const box = document.getElementById('error-box');
     box.textContent = msg;
